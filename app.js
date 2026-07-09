@@ -269,7 +269,7 @@ function closePicker() {
 }
 
 function renderPicker() {
-  const q = $('#picker-search').value.toLowerCase();
+  const q = ($('#picker-search')?.value || '').toLowerCase();
   const filtered = state.exercises.filter(e => e.name.toLowerCase().includes(q));
   $('#picker-list').innerHTML = filtered.map(e => `
     <button class="picker-item" onclick="addExerciseToDay('${e.id}')">
@@ -351,6 +351,16 @@ function startRestForSet(exIdx) {
   if (!d || exIdx >= d.exercises.length) return;
   const rest = d.exercises[exIdx].rest || 90;
   startRestTimer(rest);
+}
+
+/* ================= WEIGHT INPUT HANDLER ================= */
+function handleWeightInput(exIdx, setIdx, newValue) {
+  const d = getOpenDay();
+  if (!d) return;
+  const set = d.exercises[exIdx].sets[setIdx];
+  const kgValue = kgFromDisplay(parseFloat(newValue) || 0);
+  set.weight = Math.max(0, kgValue);
+  save(); render();
 }
 
 /* ================= EXERCISE LIBRARY ================= */
@@ -602,7 +612,7 @@ function renderDay() {
             <div class="weight-input">
               <button onclick="updateSet(${i}, ${j}, 'weight', -${weightStep()})">−</button>
               <input type="number" step="0.5" value="${dispW(s.weight).toFixed(1)}" 
-                     onchange="updateSet(${i}, ${j}, 'weight', ${kgFromDisplay(parseFloat(this.value))} - state.weeks[0].days[0].exercises[0].sets[0].weight)">
+                     onchange="handleWeightInput(${i}, ${j}, this.value)">
               <span>${unitLabel()}</span>
               <button onclick="updateSet(${i}, ${j}, 'weight', ${weightStep()})">+</button>
             </div>
