@@ -262,11 +262,10 @@ function toggleComplete() {
 let pickerTarget = null;
 
 function openPicker() {
-  if (!openDayRef) {
+  if (!getOpenDay()) {
     alert('Open a workout day first!');
     return;
   }
-  pickerTarget = { weekId: openDayRef.weekId, dayId: openDayRef.dayId };
   $('#picker-modal').classList.add('open');
   $('#picker-search').value = '';
   renderPickerList('');
@@ -288,18 +287,21 @@ function renderPicker() {
 }
 
 function addExerciseToDay(exId) {
-  const ref = pickerTarget || openDayRef;
-  if (!ref) {
-    alert('Error: no day selected. Close this and reopen the day.');
-    return;
-  }
-  const w = getWeek(ref.weekId);
-  const d = w ? w.days.find(x => x.id === ref.dayId) : null;
+  const d = getOpenDay();
   const ex = getExercise(exId);
-  if (!ex || !d) {
-    alert('Error: could not find day or exercise.');
-    return;
-  }
+
+  if (!d) { alert('DEBUG: getOpenDay() returned nothing!'); return; }
+  if (!ex) { alert('DEBUG: exercise not found, id = ' + exId); return; }
+
+  d.exercises.push({
+    id: uid(),
+    exName: ex.name,
+    rest: ex.rest,
+    sets: [{ id: uid(), type: 'work', weight: 20, reps: 10, done: false }]
+  });
+
+  save(); render(); closePicker();
+}
 
   d.exercises.push({
     id: uid(),
