@@ -259,9 +259,18 @@ function toggleComplete() {
 }
 
 /* ================= EXERCISES IN DAY ================= */
+let pickerTarget = null;
+
 function openPicker() {
-  $('#picker').classList.remove('hidden');
-  renderPicker();
+  if (!openDayRef) {
+    alert('Open a workout day first!');
+    return;
+  }
+  pickerTarget = { weekId: openDayRef.weekId, dayId: openDayRef.dayId };
+  $('#picker-modal').classList.add('open');
+  $('#picker-search').value = '';
+  renderPickerList('');
+  $('#picker-search').focus();
 }
 
 function closePicker() {
@@ -279,20 +288,28 @@ function renderPicker() {
 }
 
 function addExerciseToDay(exId) {
-  const d = getOpenDay();
+  const ref = pickerTarget || openDayRef;
+  if (!ref) {
+    alert('Error: no day selected. Close this and reopen the day.');
+    return;
+  }
+  const w = getWeek(ref.weekId);
+  const d = w ? w.days.find(x => x.id === ref.dayId) : null;
   const ex = getExercise(exId);
-  if (!ex || !d) return;
-  
+  if (!ex || !d) {
+    alert('Error: could not find day or exercise.');
+    return;
+  }
+
   d.exercises.push({
     id: uid(),
     exName: ex.name,
     rest: ex.rest,
     sets: [{ id: uid(), type: 'work', weight: 20, reps: 10, done: false }]
   });
-  
+
   save(); render(); closePicker();
 }
-
 function removeExerciseFromDay(exIdx) {
   const d = getOpenDay();
   if (!d) return;
