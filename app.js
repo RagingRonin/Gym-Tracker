@@ -311,7 +311,7 @@ function addExerciseToDay(exId) {
   });
 
   save(); render(); closePicker();
-}
+
 function removeExerciseFromDay(exIdx) {
   const d = getOpenDay();
   if (!d) return;
