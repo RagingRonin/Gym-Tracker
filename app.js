@@ -290,8 +290,7 @@ function addExerciseToDay(exId) {
   const d = getOpenDay();
   const ex = getExercise(exId);
 
-  if (!d) { alert('DEBUG: getOpenDay() returned nothing!'); return; }
-  if (!ex) { alert('DEBUG: exercise not found, id = ' + exId); return; }
+if (!d || !ex) return;
 
   d.exercises.push({
     id: uid(),
@@ -302,15 +301,6 @@ function addExerciseToDay(exId) {
 
   save(); render(); closePicker();
 }
-
-  d.exercises.push({
-    id: uid(),
-    exName: ex.name,
-    rest: ex.rest,
-    sets: [{ id: uid(), type: 'work', weight: 20, reps: 10, done: false }]
-  });
-
-  save(); render(); closePicker();
 
 function removeExerciseFromDay(exIdx) {
   const d = getOpenDay();
