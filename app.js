@@ -269,18 +269,20 @@ function openPicker() {
     alert('Open a workout day first!');
     return;
   }
-  $('#picker').classList.add('open');
+  $('#picker').classList.remove('hidden');
   $('#picker-search').value = '';
-  renderPickerList('');
+  renderPicker();
   $('#picker-search').focus();
 }
 
 function closePicker() {
   $('#picker').classList.add('hidden');
 }
+
 function onPickerSearchInput() {
   renderPicker();
 }
+
 function renderPicker() {
   const q = ($('#picker-search')?.value || '').toLowerCase();
   const filtered = state.exercises.filter(e => e.name.toLowerCase().includes(q));
