@@ -93,11 +93,12 @@ let durationTimer = null;
 
 function switchTab(tab) {
   currentTab = tab;
-if (tab !== 'day') {
+  if (tab !== 'day') {
     openDayRef = null;
     stopDurationTimer();
     stopRestTimer();
-  }  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+  }
+  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
   $('#view-' + tab).classList.remove('hidden');
   document.querySelectorAll('#tabbar button').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tab));
@@ -566,7 +567,7 @@ function renderPlan() {
                 <button class="day-btn" onclick="openDay('${week.id}', '${d.id}')">
                   <span class="day-name">${esc(d.name)}</span>
                   <span class="day-count">${d.exercises.length} ex</span>
-                  ${completed ? '<span class="check">✓</span>' : ''}
+                  ${completed? '<span class="check">✓</span>' : ''}
                 </button>
                 <div class="day-item-actions">
                   <button class="icon-btn" onclick="renameDay('${week.id}', '${d.id}')">✎</button>
@@ -584,7 +585,7 @@ function renderPlan() {
   $('#weeks-list').innerHTML = html || '<p class="muted">No weeks yet. Add one to get started!</p>';
 }
 
-function deleteDay(weekId, dayId, skipConfirm) {
+function deleteOpenDay(weekId, dayId, skipConfirm) {
   const w = getWeek(weekId);
   const d = getDay(weekId, dayId);
   if (!skipConfirm && !confirm(`Delete "${d.name}"?`)) return;
