@@ -269,7 +269,7 @@ function openPicker() {
     alert('Open a workout day first!');
     return;
   }
-  $('#picker-modal').classList.add('open');
+  $('#picker').classList.add('open');
   $('#picker-search').value = '';
   renderPickerList('');
   $('#picker-search').focus();
@@ -278,7 +278,9 @@ function openPicker() {
 function closePicker() {
   $('#picker').classList.add('hidden');
 }
-
+function onPickerSearchInput() {
+  renderPicker();
+}
 function renderPicker() {
   const q = ($('#picker-search')?.value || '').toLowerCase();
   const filtered = state.exercises.filter(e => e.name.toLowerCase().includes(q));
