@@ -93,8 +93,11 @@ let durationTimer = null;
 
 function switchTab(tab) {
   currentTab = tab;
-  openDayRef = null;
-  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
+if (tab !== 'day') {
+    openDayRef = null;
+    stopDurationTimer();
+    stopRestTimer();
+  }  document.querySelectorAll('.view').forEach(v => v.classList.add('hidden'));
   $('#view-' + tab).classList.remove('hidden');
   document.querySelectorAll('#tabbar button').forEach(b =>
     b.classList.toggle('active', b.dataset.tab === tab));
@@ -238,7 +241,7 @@ function openDay(weekId, dayId) {
   switchTab('day');
 }
 
-function deleteDay() {
+function deleteOpenDay() {
   if (!openDayRef) return;
   if (!confirm('Delete this workout day?')) return;
   const w = getWeek(openDayRef.weekId);
@@ -347,6 +350,16 @@ function updateSet(exIdx, setIdx, field, delta) {
   save(); render();
 }
 
+function setWeightDirect(exIdx, setIdx, value) {
+  const d = getOpenDay();
+  if (!d) return;
+  const set = d.exercises[exIdx].sets[setIdx];
+  const num = parseFloat(value);
+  if (isNaN(num) || num < 0) { render(); return; }
+  set.weight = +kgFromDisplay(num).toFixed(2);
+  save(); render();
+}
+
 function toggleSetDone(exIdx, setIdx) {
   const d = getOpenDay();
   if (!d) return;
@@ -360,16 +373,6 @@ function startRestForSet(exIdx) {
   if (!d || exIdx >= d.exercises.length) return;
   const rest = d.exercises[exIdx].rest || 90;
   startRestTimer(rest);
-}
-
-/* ================= WEIGHT INPUT HANDLER ================= */
-function handleWeightInput(exIdx, setIdx, newValue) {
-  const d = getOpenDay();
-  if (!d) return;
-  const set = d.exercises[exIdx].sets[setIdx];
-  const kgValue = kgFromDisplay(parseFloat(newValue) || 0);
-  set.weight = Math.max(0, kgValue);
-  save(); render();
 }
 
 /* ================= EXERCISE LIBRARY ================= */
@@ -468,7 +471,7 @@ function renderCalendar() {
   });
   
   // Build calendar grid
-  const firstDay = new Date(y, m, 1).getDay();
+  const firstDay = (new Date(y, m, 1).getDay() + 6) % 7;
   const daysInMonth = new Date(y, m + 1, 0).getDate();
   const grid = [];
   
@@ -620,8 +623,9 @@ function renderDay() {
             
             <div class="weight-input">
               <button onclick="updateSet(${i}, ${j}, 'weight', -${weightStep()})">−</button>
-              <input type="number" step="0.5" value="${dispW(s.weight).toFixed(1)}" 
-                     onchange="handleWeightInput(${i}, ${j}, this.value)">
+              <input type="number" step="0.5" inputmode="decimal" value="${dispW(s.weight).toFixed(1)}" 
+                     onchange="setWeightDirect(${i}, ${j}, this.value)">
+
               <span>${unitLabel()}</span>
               <button onclick="updateSet(${i}, ${j}, 'weight', ${weightStep()})">+</button>
             </div>
